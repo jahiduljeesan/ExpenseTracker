@@ -245,13 +245,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/home_view_bg"
-            android:minHeight="800dp">
+            >
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/homeTabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
+                android:minHeight="@dimen/_600sdp"
                 android:layout_marginTop="@dimen/_9sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -275,7 +276,7 @@
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/listViewPager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_500sdp"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -143,9 +143,9 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<DataFragment> dataFragments = new ArrayList<>();
 
         // Creating multiple instance of Data Fragment for multiple uses of this fragment
-        DataFragment all = new DataFragment("all");
-        DataFragment expense = new DataFragment("expense");
-        DataFragment income = new DataFragment("income");
+        DataFragment all = new DataFragment("All");
+        DataFragment expense = new DataFragment("Expense");
+        DataFragment income = new DataFragment("Income");
 
         // adding all instance to to this array
         dataFragments.add(all);

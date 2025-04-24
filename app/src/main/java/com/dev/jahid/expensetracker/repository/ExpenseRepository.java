@@ -2,10 +2,13 @@ package com.dev.jahid.expensetracker.repository;
 
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
+
 import com.dev.jahid.expensetracker.dao.ExpenseDao;
 import com.dev.jahid.expensetracker.database.ExpenseDatabase;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,5 +31,13 @@ public class ExpenseRepository {
         executorService.execute(() -> {
             expenseDao.addExpense(expenseModel);
         } );
+    }
+
+    public LiveData<List<ExpenseModel>> getAllData() {
+        return expenseDao.getAllData();
+    }
+
+    public LiveData<List<ExpenseModel>> getAllExpenses() {
+        return expenseDao.getAllData();
     }
 }
