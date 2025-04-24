@@ -8,7 +8,7 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
-        android:layout_height="@dimen/_280sdp"
+        android:layout_height="@dimen/_325sdp"
         android:layout_width="match_parent"
         >
 
@@ -35,10 +35,10 @@
                     android:layout_height="@dimen/_70sdp"
                     android:src="@drawable/app_logo"
                     app:layout_constraintEnd_toStartOf="@+id/textView2"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/barChartCard"/>
 
                 <TextView
                     android:id="@+id/textView2"
@@ -49,19 +49,37 @@
                     android:textSize="@dimen/_18sdp"
                     app:layout_constraintBottom_toBottomOf="@+id/app_logo"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/app_logo"
                     app:layout_constraintTop_toTopOf="@+id/app_logo" />
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/piChart"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/barChartCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/_8sdp"
+                    app:cardElevation="@dimen/_10sdp"
+                    android:elevation="12dp"
+                    android:background="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    android:padding="@dimen/_12sdp"
                     app:layout_constraintBottom_toTopOf="@+id/btnInc"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/app_logo" />
+                    app:layout_constraintTop_toBottomOf="@id/app_logo">
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/barChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_170sdp"
+                        android:layout_marginBottom="@dimen/_16sdp"
+                        android:background="#FAFAFA"
+                        android:clipToPadding="false"
+                        android:clipChildren="false"/>
+                </androidx.cardview.widget.CardView>
+
+
+
+
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnExp"
@@ -70,6 +88,7 @@
                     android:layout_margin="@dimen/_10sdp"
                     app:cardCornerRadius="@dimen/_14sdp"
                     app:cardElevation="@dimen/_10sdp"
+                    app:layout_constraintTop_toBottomOf="@id/barChartCard"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnInc"
                     app:layout_constraintStart_toStartOf="parent">

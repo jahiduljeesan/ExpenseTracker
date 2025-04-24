@@ -19,12 +19,21 @@ import com.dev.jahid.expensetracker.R;
 import com.dev.jahid.expensetracker.databinding.ActivityMainBinding;
 import com.dev.jahid.expensetracker.entity_model.CategorySumModel;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
+import com.dev.jahid.expensetracker.renderer.RoundedBarChartRenderer;
 import com.dev.jahid.expensetracker.repository.ExpenseRepository;
 import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModel;
 import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModelFactory;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.appbar.AppBarLayout;
@@ -87,39 +96,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initPiChart(long balance) {
-        expenseViewModel.getExpenseSumByCategory().observe(this,remainingBalanceList -> {
+        BarChart barChart = binding.barChart;
 
-            List<PieEntry> pieEntries = new ArrayList<>();
+        expenseViewModel.getExpenseSumByCategory().observe(this, remainingBalanceList -> {
+            // Define unique colors for each category
+            int[] categoryColors = new int[]{
+                    Color.parseColor("#FF6B6B"), // red
+                    Color.parseColor("#FFD93D"), // yellow
+                    Color.parseColor("#6BCB77"), // green
+                    Color.parseColor("#4D96FF"), // blue
+                    Color.parseColor("#9D4EDD"), // purple
+                    Color.parseColor("#FF9671"), // orange
+                    Color.parseColor("#00C9A7")  // teal
+            };
 
-            remainingBalanceList.forEach(cm -> {
-                pieEntries.add(new PieEntry(cm.amount, cm.category));
-            });
+            // Prepare data for the chart
+            List<BarEntry> entries = new ArrayList<>();
+            List<String> labels = new ArrayList<>();
 
-            PieDataSet pieDataSet = new PieDataSet(pieEntries,"Expense By Category");
-            pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-            pieDataSet.setValueTextColor(R.color.color_primary_dark);
-            pieDataSet.setValueTextSize(12f);
-            pieDataSet.setValueFormatter(new PercentFormatter(binding.piChart));
+            // Loop to fill entries and labels with data from the database
+            for (int i = 0; i < remainingBalanceList.size(); i++) {
+                CategorySumModel cm = remainingBalanceList.get(i);
+                entries.add(new BarEntry(i, cm.amount)); // Add data for the bar
+                labels.add(cm.category); // Add label for each bar
+            }
 
-            PieData pieData = new PieData(pieDataSet);
-            pieData.setValueTextColor(R.color.color_primary_dark);
-            pieData.setValueTextSize(12f);
-            binding.piChart.setData(pieData);
+            // Create a BarDataSet and apply the category colors
+            BarDataSet dataSet = new BarDataSet(entries, ""); // Empty string to remove the title
+            dataSet.setColors(categoryColors); // Set the bar colors here
+            dataSet.setValueTextColor(Color.BLACK); // Set text color on top of the bars
+            dataSet.setValueTextSize(13f); // Set text size for the values on top of bars
 
-            binding.piChart.setUsePercentValues(true);
-            binding.piChart.getDescription().setEnabled(false);
-            binding.piChart.animateY(1000);
-            binding.piChart.setHoleColor(R.color.color_primary_dark);
-            binding.piChart.setDrawEntryLabels(true); // Show category names
-            binding.piChart.setEntryLabelColor(Color.parseColor("#000000")); // Set category name color
-            binding.piChart.setEntryLabelTextSize(10f);
-            binding.piChart.setCenterText("Balance\n" + balance +"\n BDT");
-            binding.piChart.setCenterTextSize(14f);
-            binding.piChart.getLegend().setEnabled(false);
-            binding.piChart.setCenterTextColor(Color.WHITE);
-            binding.piChart.invalidate();
+            // Set the BarData for the chart
+            BarData barData = new BarData(dataSet);
+            barData.setBarWidth(0.8f); // Set bar width
+            barChart.setData(barData); // Set data to the bar chart
+
+            // Configure X Axis
+            XAxis xAxis = barChart.getXAxis();
+            xAxis.setTextSize(12f);
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setDrawGridLines(true);
+            xAxis.setGridColor(Color.parseColor("#DDDDDD"));
+            xAxis.setGranularity(1f); // To ensure each bar is correctly labeled
+            xAxis.setLabelCount(labels.size());
+            xAxis.setValueFormatter(new IndexAxisValueFormatter(labels)); // Set labels to X Axis
+
+            // Configure Y Axis
+            YAxis yAxisLeft = barChart.getAxisLeft();
+            YAxis yAxisRight = barChart.getAxisRight();
+            yAxisLeft.setTextColor(Color.BLACK);
+            yAxisLeft.setGridColor(Color.parseColor("#EEEEEE"));
+            yAxisRight.setEnabled(false); // Disable the right Y Axis
+
+            // Configure Legend
+            Legend legend = barChart.getLegend();
+            legend.setEnabled(false); // Disable the legend (if not needed)
+
+            // Final chart settings
+            barChart.setDrawGridBackground(false); // No grid in the background
+            barChart.setDescription(null); // Remove description text
+            barChart.animateY(1200); // Animate the chart with Y-axis animation
+            barChart.setDoubleTapToZoomEnabled(false); // Disable double-tap zoom
+            barChart.setScaleEnabled(false);
+            barChart.invalidate(); // Refresh the chart
         });
     }
+
 
     private void showBottomSheet(int tabPosition) {
 
