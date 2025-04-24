@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.dev.jahid.expensetracker.entity_model.CategorySumModel;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
 import com.dev.jahid.expensetracker.repository.ExpenseRepository;
 
@@ -28,5 +29,21 @@ public class ExpenseViewModel extends ViewModel {
     }
     public LiveData<List<ExpenseModel>> getAllData() {
         return expenseRepo.getAllData();
+    }
+
+    public LiveData<Long> getTotalIncome() {
+        return expenseRepo.getTotalIncome();
+    }
+
+    public LiveData<Long> getTotalExpense() {
+        return expenseRepo.getTotalExpense();
+    }
+
+    public LiveData<List<CategorySumModel>> getExpenseSumByCategory() {
+        return expenseRepo.getExpenseSumByCategory();
+    }
+
+    public LiveData<Long> getRemainingBalance() {
+        return expenseRepo.getRemainingBalance();
     }
 }

@@ -72,13 +72,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etlCategory"
-        app:startIconDrawable="@drawable/ic_category"
+        app:startIconDrawable="@drawable/ic_money"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
             android:hint="Amount (TK)"/>
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -99,7 +100,7 @@
         app:counterTextColor="@color/color_primary"
         app:counterMaxLength="101"
         app:layout_constraintTop_toBottomOf="@+id/etlAmount"
-        app:startIconDrawable="@drawable/ic_category"
+        app:startIconDrawable="@drawable/ic_note"
         app:startIconTint="@color/color_primary">
 
         <com.google.android.material.textfield.TextInputEditText

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 
 import com.dev.jahid.expensetracker.dao.ExpenseDao;
 import com.dev.jahid.expensetracker.database.ExpenseDatabase;
+import com.dev.jahid.expensetracker.entity_model.CategorySumModel;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
 
 import java.util.List;
@@ -39,5 +40,21 @@ public class ExpenseRepository {
 
     public LiveData<List<ExpenseModel>> getAllExpenses() {
         return expenseDao.getAllData();
+    }
+
+    public LiveData<Long> getTotalIncome() {
+        return expenseDao.getTotalIncome();
+    }
+
+    public LiveData<Long> getTotalExpense() {
+        return expenseDao.getTotalExpense();
+    }
+
+    public LiveData<List<CategorySumModel>> getExpenseSumByCategory() {
+        return expenseDao.getExpenseSumByCategory();
+    }
+
+    public LiveData<Long> getRemainingBalance() {
+        return expenseDao.getRemainingBalance();
     }
 }

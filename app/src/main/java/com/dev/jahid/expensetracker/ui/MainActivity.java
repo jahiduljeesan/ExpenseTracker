@@ -1,5 +1,6 @@
 package com.dev.jahid.expensetracker.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,13 +11,22 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.dev.jahid.expensetracker.adapter.DataViewPagerAdapter;
 import com.dev.jahid.expensetracker.R;
 import com.dev.jahid.expensetracker.databinding.ActivityMainBinding;
+import com.dev.jahid.expensetracker.entity_model.CategorySumModel;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
 import com.dev.jahid.expensetracker.repository.ExpenseRepository;
+import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModel;
+import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModelFactory;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
@@ -24,9 +34,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private String category = "",type = "Expense",remark = "";
     private long amount = 0;
     private ExpenseRepository expenseRepo;
+    private ExpenseViewModel expenseViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +54,20 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        //initializing multiple instance of DataModel fragment
         initViewpager();
 
+        expenseViewModel = new ViewModelProvider(this,new ExpenseViewModelFactory(this))
+                .get(ExpenseViewModel.class);
         expenseRepo = ExpenseRepository.getInstance(this);
+        // initializing pi chart
+        expenseViewModel.getRemainingBalance().observe(this,balance -> {
+            initPiChart(balance);
+        });
 
-        binding.btnExp.setOnClickListener(v -> showBottomSheet());
+
+        binding.btnExp.setOnClickListener(v -> showBottomSheet(0));
+        binding.btnInc.setOnClickListener(v -> showBottomSheet(1));
 
         //Handelling collapsing;
         binding.appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -65,12 +86,49 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void showBottomSheet() {
+    private void initPiChart(long balance) {
+        expenseViewModel.getExpenseSumByCategory().observe(this,remainingBalanceList -> {
+
+            List<PieEntry> pieEntries = new ArrayList<>();
+
+            remainingBalanceList.forEach(cm -> {
+                pieEntries.add(new PieEntry(cm.amount, cm.category));
+            });
+
+            PieDataSet pieDataSet = new PieDataSet(pieEntries,"Expense By Category");
+            pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+            pieDataSet.setValueTextColor(R.color.color_primary_dark);
+            pieDataSet.setValueTextSize(12f);
+            pieDataSet.setValueFormatter(new PercentFormatter(binding.piChart));
+
+            PieData pieData = new PieData(pieDataSet);
+            pieData.setValueTextColor(R.color.color_primary_dark);
+            pieData.setValueTextSize(12f);
+            binding.piChart.setData(pieData);
+
+            binding.piChart.setUsePercentValues(true);
+            binding.piChart.getDescription().setEnabled(false);
+            binding.piChart.animateY(1000);
+            binding.piChart.setHoleColor(R.color.color_primary_dark);
+            binding.piChart.setDrawEntryLabels(true); // Show category names
+            binding.piChart.setEntryLabelColor(Color.parseColor("#000000")); // Set category name color
+            binding.piChart.setEntryLabelTextSize(10f);
+            binding.piChart.setCenterText("Balance\n" + balance +"\n BDT");
+            binding.piChart.setCenterTextSize(14f);
+            binding.piChart.getLegend().setEnabled(false);
+            binding.piChart.setCenterTextColor(Color.WHITE);
+            binding.piChart.invalidate();
+        });
+    }
+
+    private void showBottomSheet(int tabPosition) {
+
         BottomSheetDialog bottomSheet = new BottomSheetDialog(this);
         View view = LayoutInflater.from(this).inflate(R.layout.data_add_bottomsheet,null);
         bottomSheet.setContentView(view);
 
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
+        tabLayout.selectTab(tabLayout.getTabAt(tabPosition));
         TextInputLayout etlCategory = view.findViewById(R.id.etlCategory),
         etlAmount = view.findViewById(R.id.etlAmount);
 

@@ -83,13 +83,14 @@ public class ExpenseListAdapter extends RecyclerView.Adapter<ExpenseListAdapter.
 
         holder.tvCategory.setText(expenseModel.getCategory());
         holder.tvRemark.setText(expenseModel.getRemark());
+        holder.tvDateTime.setText(expenseModel.getDateTime());
         // Setting amount color as per type
-        if (tag.equals("Income")) {
-            holder.tvAmount.setText("-"+String.valueOf(expenseModel.getAmount())+"BDT");
+        if (expenseModel.getType().equals("Income")) {
+            holder.tvAmount.setText("+"+String.valueOf(expenseModel.getAmount())+" BDT");
             holder.tvAmount.setTextColor(
                     ContextCompat.getColor(context,R.color.color_primary_dark));
         } else {
-            holder.tvAmount.setText("+"+String.valueOf(expenseModel.getAmount())+"BDT");
+            holder.tvAmount.setText("-"+String.valueOf(expenseModel.getAmount())+" BDT");
             holder.tvAmount.setTextColor(
                     ContextCompat.getColor(context,R.color.red));
         }
