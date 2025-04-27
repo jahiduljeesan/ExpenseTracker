@@ -19,6 +19,9 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expense_table WHERE type = 'Expense'")
     LiveData<List<ExpenseModel>> getAllExpense();
 
+    @Query("SELECT * FROM expense_table where type = 'Income'")
+    LiveData<List<ExpenseModel>> getAllIncome();
+
     @Query("SELECT * FROM expense_table")
     LiveData<List<ExpenseModel>> getAllData();
 

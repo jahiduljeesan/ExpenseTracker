@@ -57,12 +57,14 @@ public class DataFragment extends Fragment {
         if (listTag.equals("All")) {
             viewModel.getAllData().observe(getViewLifecycleOwner(),allList -> {
                 adapter.setExpenseModelList(allList,"All");
-                Log.d("ListCheck",allList.size()+"");
             });
         } else if (listTag.equals("Expense")) {
             viewModel.getAllExpenses().observe(getViewLifecycleOwner(),expenseList -> {
-                adapter.setExpenseModelList(expenseList,"All");
-                Log.d("ListCheck",expenseList.size()+"");
+                adapter.setExpenseModelList(expenseList,"Expense");
+            });
+        } else {
+            viewModel.getAllIncome().observe(getViewLifecycleOwner(),incomeList -> {
+                adapter.setExpenseModelList(incomeList,"Income");
             });
         }
     }

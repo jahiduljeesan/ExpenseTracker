@@ -27,6 +27,11 @@ public class ExpenseViewModel extends ViewModel {
     public LiveData<List<ExpenseModel>> getAllExpenses() {
         return expenseRepo.getAllExpenses();
     }
+
+    public LiveData<List<ExpenseModel>> getAllIncome() {
+        return expenseRepo.getAllIncome();
+    }
+
     public LiveData<List<ExpenseModel>> getAllData() {
         return expenseRepo.getAllData();
     }

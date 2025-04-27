@@ -20,4 +20,10 @@
         <item>Others</item>
     </string-array>
 
+    <string-array name="income_category_list">
+        <item>Fixed</item>
+        <item>Variable</item>
+        <item>Others</item>
+    </string-array>
+
 </resources>

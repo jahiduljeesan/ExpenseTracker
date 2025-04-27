@@ -39,8 +39,10 @@ public class ExpenseRepository {
     }
 
     public LiveData<List<ExpenseModel>> getAllExpenses() {
-        return expenseDao.getAllData();
+        return expenseDao.getAllExpense();
     }
+
+    public LiveData<List<ExpenseModel>> getAllIncome() { return expenseDao.getAllIncome(); };
 
     public LiveData<Long> getTotalIncome() {
         return expenseDao.getTotalIncome();

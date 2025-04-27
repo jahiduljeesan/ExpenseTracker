@@ -12,6 +12,7 @@
         android:layout_width="@dimen/_35sdp"
         android:layout_height="@dimen/_35sdp"
         android:src="@drawable/bill_icon"
+        android:padding="@dimen/_2sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tvAmount"
         app:layout_constraintHorizontal_chainStyle="spread_inside"

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
@@ -19,7 +20,6 @@ import com.dev.jahid.expensetracker.R;
 import com.dev.jahid.expensetracker.databinding.ActivityMainBinding;
 import com.dev.jahid.expensetracker.entity_model.CategorySumModel;
 import com.dev.jahid.expensetracker.entity_model.ExpenseModel;
-import com.dev.jahid.expensetracker.renderer.RoundedBarChartRenderer;
 import com.dev.jahid.expensetracker.repository.ExpenseRepository;
 import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModel;
 import com.dev.jahid.expensetracker.viewmodel.ExpenseViewModelFactory;
@@ -30,12 +30,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
@@ -55,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private long amount = 0;
     private ExpenseRepository expenseRepo;
     private ExpenseViewModel expenseViewModel;
+    private String[] categoryTypeList;
 
 
     @Override
@@ -62,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //initializing category type list;
+        categoryTypeList = getResources().getStringArray(R.array.category_list);
 
         //initializing multiple instance of DataModel fragment
         initViewpager();
@@ -72,8 +71,21 @@ public class MainActivity extends AppCompatActivity {
         // initializing pi chart
         expenseViewModel.getRemainingBalance().observe(this,balance -> {
             initPiChart(balance);
+            if (isAbsulate(balance)) {
+                binding.tvRemainingBalance.setTextColor(ContextCompat.getColor(this,R.color.color_primary_dark));
+            } else {
+                binding.tvRemainingBalance.setTextColor(ContextCompat.getColor(this,R.color.red));
+            }
+            binding.tvRemainingBalance.setText(balance.toString()+" /=");
         });
 
+        expenseViewModel.getTotalExpense().observe(this,expense -> {
+            binding.tvTotalExp.setText(expense.toString()+"/=");
+        });
+
+        expenseViewModel.getTotalIncome().observe(this,income -> {
+            binding.tvTotalInc.setText(income.toString()+"/=");
+        });
 
         binding.btnExp.setOnClickListener(v -> showBottomSheet(0));
         binding.btnInc.setOnClickListener(v -> showBottomSheet(1));
@@ -93,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private boolean isAbsulate(Long balance) {
+        return balance == Math.abs(balance);
     }
 
     private void initPiChart(long balance) {
@@ -125,16 +141,17 @@ public class MainActivity extends AppCompatActivity {
             BarDataSet dataSet = new BarDataSet(entries, ""); // Empty string to remove the title
             dataSet.setColors(categoryColors); // Set the bar colors here
             dataSet.setValueTextColor(Color.BLACK); // Set text color on top of the bars
-            dataSet.setValueTextSize(13f); // Set text size for the values on top of bars
+            dataSet.setValueTextSize(10f); // Set text size for the values on top of bars
 
             // Set the BarData for the chart
             BarData barData = new BarData(dataSet);
-            barData.setBarWidth(0.8f); // Set bar width
+            barData.setBarWidth(0.7f); // Set bar width
             barChart.setData(barData); // Set data to the bar chart
 
             // Configure X Axis
             XAxis xAxis = barChart.getXAxis();
-            xAxis.setTextSize(12f);
+            xAxis.setYOffset(10f); // Move labels a little upward
+            xAxis.setTextSize(10f);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setDrawGridLines(true);
             xAxis.setGridColor(Color.parseColor("#DDDDDD"));
@@ -159,12 +176,19 @@ public class MainActivity extends AppCompatActivity {
             barChart.animateY(1200); // Animate the chart with Y-axis animation
             barChart.setDoubleTapToZoomEnabled(false); // Disable double-tap zoom
             barChart.setScaleEnabled(false);
+            barChart.setExtraBottomOffset(12f); // or maybe 12f, adjust as needed
             barChart.invalidate(); // Refresh the chart
         });
     }
 
 
     private void showBottomSheet(int tabPosition) {
+
+        if (tabPosition == 1) {
+            categoryTypeList = getResources().getStringArray(R.array.income_category_list);
+        } else {
+            categoryTypeList = getResources().getStringArray(R.array.category_list);
+        }
 
         BottomSheetDialog bottomSheet = new BottomSheetDialog(this);
         View view = LayoutInflater.from(this).inflate(R.layout.data_add_bottomsheet,null);
@@ -180,17 +204,16 @@ public class MainActivity extends AppCompatActivity {
 
         AutoCompleteTextView etCategory = view.findViewById(R.id.etCategory);
         Button btnSubmit = view.findViewById(R.id.btnSubmit);
-        String [] categoryList = getResources().getStringArray(R.array.category_list);
-
-        ArrayAdapter categoryAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,categoryList);
-        etCategory.setAdapter(categoryAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 type = tab.getText().toString();
-                Log.d("SelectedTab",type);
+                Log.d("Type",type);
+                etCategory.setAdapter(new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,getList(type)));
+
             }
+
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
@@ -202,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        etCategory.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,categoryTypeList));
 
         btnSubmit.setOnClickListener(v -> {
             category = etCategory.getText().toString();
@@ -230,13 +255,19 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        Log.d("AdapterCount", String.valueOf(categoryAdapter.getCount()));
-
-        Log.d("CategoryListLength",categoryList.length+""); // categtory lengh is showing
+     // categtory lengh is showing
 
         bottomSheet.show();
     }
 
+    private String[] getList(String type) {
+        if (type.equals("Expense")) {
+            return  getResources().getStringArray(R.array.category_list);
+        }
+        else {
+            return getResources().getStringArray(R.array.income_category_list);
+        }
+    }
 
 
     private void initViewpager() {
@@ -291,3 +322,4 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
+
